@@ -10,6 +10,7 @@ private:
 
 public:
     Interval();
+    
     Interval(double a, double b);
 
     Interval(double a);

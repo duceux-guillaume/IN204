@@ -18,7 +18,10 @@ Interval::Interval(): _min(0), _max(0) {
 }
 
 Interval::Interval(double a, double b): _min(a), _max(b) {
-    std::cout << "constructeur 2" << std::endl;
+    if (a > b) {
+        _min = b;
+        _max = a;
+    }
 }
 
 Interval::Interval(double a): _min(a), _max(0) {
@@ -27,7 +30,7 @@ Interval::Interval(double a): _min(a), _max(0) {
 
 
 void Interval::print() const {
-    std::cout << "[" << _min << ", " << _max << "]" << std::endl; 
+    std::cout << "[" << _min << ", " << _max << "]" << std::endl;
 }
 
 void print(Interval const& i) {

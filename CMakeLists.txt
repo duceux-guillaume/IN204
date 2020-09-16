@@ -1,4 +1,4 @@
 cmake_minimum_required (VERSION 3.0)
 project (test)
 
-add_executable(test main.cpp module.cpp interval.cpp)
+add_executable(test main.cpp module.cpp interval.cpp economic.cpp)
