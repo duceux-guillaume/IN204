@@ -1,77 +1,116 @@
+#include "graph.hpp"
+#include "math.hpp"
 #include <iostream>
-#include "module.hpp"
-#include "interval.hpp"
-#include "economic.hpp"
 
-int unevariable = 0;
-const static int MAXIMUM = 1000;
+struct MyNode {
+  int key;
+  std::string payload;
 
-void FaitQuelquechose() {
-    unevariable++;
-    int a;
+  MyNode(int k, std::string const &p) : key(k), payload(p) {}
+};
+
+template <> struct Equal<MyNode> {
+  bool operator()(const MyNode &k1, const MyNode &k2) const {
+    return k1.key == k2.key;
+  }
+};
+
+std::ostream &operator<<(std::ostream &out, MyNode const &node) {
+  out << node.key << " " << node.payload;
+  return out;
 }
 
-int main(int argc, char** argv) {
-    std::cout << "Hello IN204" << std::endl;
+template <typename T> struct Comparaison {
+  bool operator()(T const &l, T const &r) const { return l < r; }
+};
 
-    FaitQuelquechose();
-
-    InitModule();
-
-    Interval i1;
-    Interval i2(1., 2.);
-    Interval i22(2., 1.);
-
-    std::cout << i1 + i2 << " = " << i1 << " + " << i2 << " " << i22 << std::endl;
-
-    auto i3 = i1.plus(i2);
-    auto i4 = i1 + i2;
-
-    i1.print();
-    print(i1);
-
-    Interval* pt = nullptr;
-    { 
-        pt = new Interval();
+template <typename T, typename YourComparaison = Comparaison<T>>
+void Triage(std::vector<T> &input, YourComparaison comp = YourComparaison()) {
+  for (int i = 0; i < input.size() - 1; ++i) {
+    for (int j = i + 1; j < input.size(); ++j) {
+      if (comp(input[i], input[j])) {
+        std::swap(input[i], input[j]);
+      }
     }
+  }
+}
 
-    { 
-        Interval tt;
+void TriageDouble(std::vector<double> &input) {
+  for (int i = 0; i < input.size() - 1; ++i) {
+    for (int j = i + 1; j < input.size(); ++j) {
+      if (input[i] < input[j]) {
+        std::swap(input[i], input[j]);
+      }
     }
+  }
+}
 
-    // 
-    pt->print();
+template <typename T> void AfficheVector(std::vector<T> const &v) {
+  std::cout << "DEBUT" << std::endl;
+  for (auto const &var : v) {
+    std::cout << var << std::endl;
+  }
+  std::cout << "FIN" << std::endl;
+}
 
-    std::cout << pt << std::endl;
+void AfficheVectorDouble(std::vector<double> const &v) {
+  std::cout << "DEBUT" << std::endl;
+  for (auto const &var : v) {
+    std::cout << var << std::endl;
+  }
+  std::cout << "FIN" << std::endl;
+}
 
-    delete pt;
+struct Chaussette {
+  int taille;
 
-    std::cout << i1 + 4. << " = " << i1 << " + " << 4. << std::endl;
-    std::cout << Interval(i1) << std::endl;
+  Chaussette(int t) : taille(t) {}
+};
 
-    int valeur = 5;
-    int* ptr = &valeur;
+std::ostream &operator<<(std::ostream &out, Chaussette const &r) {
+  out << r.taille;
+  return out;
+}
 
-    std::cout << ptr << " " << &valeur << " " << valeur << std::endl;
+template <> struct Comparaison<Chaussette> {
+  bool operator()(Chaussette const &l, Chaussette const &r) const {
+    return l.taille < r.taille;
+  }
+};
 
-    
-    PersonnePhysique moi(0, "Guillaume");
-    std::cout << moi << std::endl;
-    
-    Entreprise monEntreprise(100, "Gogle", "SAS", moi);
-    monEntreprise.GagnerDeLaThune(10);
-    
+struct MaComparaison {
+  bool operator()(Chaussette const &l, Chaussette const &r) const {
+    return l.taille < r.taille;
+  }
+  // blabla
+};
 
-    std::cout <<  static_cast<AgentEconomic>(monEntreprise) << " solde: " << monEntreprise.Solde() << std::endl;
-
-    monEntreprise.Recruter(moi);
-
-    {
-        std::cout << "scope tmp" << std::endl;
-        Entreprise tmp(100, "Gogle", "SAS", moi);
-        std::cout << "scope end" << std::endl;
-    }
-        std::cout << "scope after" << std::endl;
-
-    return EXIT_SUCCESS;
+int main(int argc, char **argv) {
+  {
+    auto test = std::vector<int>{5, 3, 6, 4};
+    AfficheVector(test);
+    Triage(test);
+    AfficheVector(test);
+  }
+  {
+    auto test = std::vector<double>{5.0, 3.0, 6.0, 4.0};
+    AfficheVector(test);
+    Triage(test);
+    AfficheVector(test);
+  }
+  {
+    auto test = std::vector<Chaussette>{Chaussette(5.0), Chaussette(3.0),
+                                        Chaussette(6.0), Chaussette(4.0)};
+    AfficheVector(test);
+    Triage<Chaussette, MaComparaison>(test);
+    AfficheVector(test);
+  }
+  {
+    auto test = std::vector<Chaussette>{Chaussette(5.0), Chaussette(3.0),
+                                        Chaussette(6.0), Chaussette(4.0)};
+    AfficheVector(test);
+    Triage(test);
+    AfficheVector(test);
+  }
+  return EXIT_SUCCESS;
 }

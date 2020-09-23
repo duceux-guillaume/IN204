@@ -3,55 +3,47 @@
 
 #include <iostream>
 
-class Interval {  
-private:  
-    double _min;
-    double _max;
+class Interval {
+private:
+  double _min;
+  double _max;
 
 public:
-    Interval();
-    
-    Interval(double a, double b);
+  Interval();
 
-    Interval(double a);
+  Interval(double a, double b);
 
-    Interval(Interval const& autre);
+  Interval(double a);
 
-    ~Interval();
+  Interval(Interval const &autre);
 
-    Interval plus(Interval const& autre) const;
+  ~Interval();
 
-    void print() const;
+  Interval plus(Interval const &autre) const;
 
-    double min() const {
-        return _min;
-    }
+  void print() const;
 
-    double max() const {
-        return _max;
-    }
+  double min() const { return _min; }
+
+  double max() const { return _max; }
 };
 
-void print(Interval const& i);
+void print(Interval const &i);
 
-Interval operator+(Interval const& l, Interval r);
+Interval operator+(Interval const &l, Interval r);
 
-std::ostream& operator<<(std::ostream& out, Interval const& r);
+std::ostream &operator<<(std::ostream &out, Interval const &r);
 
 struct Image {
-    char* _data;
+  char *_data;
 
-    Image() {
-        _data = new char[1000];
-    }
+  Image() { _data = new char[1000]; }
 
-    ~Image() {
-        if (_data) {
-            delete _data;
-        }
+  ~Image() {
+    if (_data) {
+      delete _data;
     }
+  }
 };
 
 #endif // !INTERVAL_HPP
-
-
