@@ -1,6 +1,8 @@
 #include "graph.hpp"
 #include "math.hpp"
 #include <iostream>
+#include <list>
+#include <set>
 
 struct MyNode {
   int key;
@@ -24,8 +26,8 @@ template <typename T> struct Comparaison {
   bool operator()(T const &l, T const &r) const { return l < r; }
 };
 
-template <typename T, typename YourComparaison = Comparaison<T>>
-void Triage(std::vector<T> &input, YourComparaison comp = YourComparaison()) {
+template <typename T, typename G = Comparaison<T>>
+void Triage(std::vector<T> &input, G comp = G()) {
   for (int i = 0; i < input.size() - 1; ++i) {
     for (int j = i + 1; j < input.size(); ++j) {
       if (comp(input[i], input[j])) {
@@ -85,32 +87,169 @@ struct MaComparaison {
   // blabla
 };
 
+template <typename T, typename IteratorOrPointer, typename ConditionOperator>
+IteratorOrPointer
+FirstElementWithCondition(IteratorOrPointer begin, IteratorOrPointer end,
+                          ConditionOperator condition = ConditionOperator()) {
+  if (begin == end) {
+    return end;
+  }
+
+  for (auto iterator = begin; iterator != end; ++iterator) {
+    if (condition(*iterator)) {
+      return iterator;
+    }
+  }
+  return end;
+}
+
+template <typename T, typename IteratorOrPointer>
+IteratorOrPointer FirstElementGreaterThan(IteratorOrPointer begin,
+                                          IteratorOrPointer end,
+                                          T const &condition) {
+  auto lambda_condition = [condition](T const &val) {
+    if (val > condition) {
+      return true;
+    }
+    return false;
+  };
+  return FirstElementWithCondition<T, IteratorOrPointer>(begin, end,
+                                                         lambda_condition);
+}
+
+template <typename T, typename It>
+It FirstElementPositiv(It begin, It end, T &result) {
+  It res = FirstElementGreaterThan(begin, end, T(0));
+  result = *res;
+  return res;
+}
+
+struct MonIteratorDeMonConteneur {
+  int _val;
+  int _max;
+  MonIteratorDeMonConteneur(int v, int m) : _val(v), _max(m) { Next(); }
+
+  int operator*() { return _val; }
+
+  bool operator==(MonIteratorDeMonConteneur const &other) {
+    if (_val >= _max && other._val >= other._max)
+      return true;
+    return _val == other._val;
+  }
+
+  bool operator!=(MonIteratorDeMonConteneur const &other) {
+    return !(*this == other);
+  }
+
+  MonIteratorDeMonConteneur &operator++() {
+    Next();
+    return *this;
+  }
+  MonIteratorDeMonConteneur operator++(int) {
+    MonIteratorDeMonConteneur tmp(*this); // copy
+    ++(*this);                            // pre-increment
+    return tmp;                           // return old value
+  }
+
+  bool IsPrime() const {
+    if (_val <= 1) {
+      return false;
+    }
+    if (_val == 2) {
+      return true;
+    }
+    for (int diviseur = 2; diviseur < _val - 1; ++diviseur) {
+      if (_val % diviseur == 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void Next() {
+    if (_val >= _max) {
+      return;
+    }
+    do {
+      ++_val;
+    } while (!IsPrime());
+  }
+};
+
+struct MonConteneurDeNombrePremier {
+  int _borne_inferieur;
+  int _borne_superieur;
+
+  MonConteneurDeNombrePremier(int inf, int sup)
+      : _borne_inferieur(inf), _borne_superieur(sup) {}
+
+  MonIteratorDeMonConteneur begin() const {
+    return MonIteratorDeMonConteneur(_borne_inferieur, _borne_superieur);
+  }
+
+  MonIteratorDeMonConteneur end() const {
+    return MonIteratorDeMonConteneur(_borne_superieur, _borne_superieur);
+  }
+};
+
 int main(int argc, char **argv) {
-  {
-    auto test = std::vector<int>{5, 3, 6, 4};
-    AfficheVector(test);
-    Triage(test);
-    AfficheVector(test);
+  { // INTS VECT
+    std::vector<int> list{-5, 5, 8, 100, 10, 25, 35};
+    int result;
+    auto argmax = FirstElementPositiv<int>(list.begin(), list.end(), result);
+    std::cout << *argmax << std::endl;
   }
-  {
-    auto test = std::vector<double>{5.0, 3.0, 6.0, 4.0};
-    AfficheVector(test);
-    Triage(test);
-    AfficheVector(test);
+
+  { // DOUBLE LIST
+    std::vector<double> list{-5.0, 0., 8., 100., 10., 25., 35.};
+    double result;
+    auto argmax = FirstElementPositiv<double>(list.begin(), list.end(), result);
+    std::cout << *argmax << std::endl;
   }
-  {
-    auto test = std::vector<Chaussette>{Chaussette(5.0), Chaussette(3.0),
-                                        Chaussette(6.0), Chaussette(4.0)};
-    AfficheVector(test);
-    Triage<Chaussette, MaComparaison>(test);
-    AfficheVector(test);
+
+  { // DOUBLE LIST
+    std::list<double> conteneur{-5.0, 0., 8., 100., 10., 25., 35.};
+    double result;
+    auto argmax =
+        FirstElementPositiv<double>(conteneur.begin(), conteneur.end(), result);
+    std::cout << *argmax << std::endl;
   }
-  {
-    auto test = std::vector<Chaussette>{Chaussette(5.0), Chaussette(3.0),
-                                        Chaussette(6.0), Chaussette(4.0)};
-    AfficheVector(test);
-    Triage(test);
-    AfficheVector(test);
+
+  { // DOUBLE SET
+    std::set<double> conteneur{-5.0, 0., 8., 100., 10., 25., 35.};
+    double result;
+    auto argmax =
+        FirstElementPositiv<double>(conteneur.begin(), conteneur.end(), result);
+    std::cout << *argmax << std::endl;
   }
+
+  { // DOUBLE TAB
+    double conteneur[] = {-5.0, 0., 8., 100., 10., 25., 35.};
+    double result;
+    auto argmax =
+        FirstElementPositiv<double>(&conteneur[0], &conteneur[6], result);
+    std::cout << *argmax << std::endl;
+  }
+
+  { // DOUBLE TAB
+    double conteneur[] = {-5.0, 0., 8., 100., 10., 25., 35.};
+    double result;
+    auto argmax =
+        FirstElementGreaterThan<double>(&conteneur[0], &conteneur[6], 10.);
+    std::cout << *argmax << std::endl;
+  }
+
+  { // INT MonConteneurDeNombrePremier
+    MonConteneurDeNombrePremier conteneur(0, 100);
+    std::cout << "nb premier" << std::endl;
+    for (auto p : conteneur) {
+      std::cout << p << std::endl;
+    }
+    std::cout << "fin" << std::endl;
+    auto argmax =
+        FirstElementGreaterThan<int>(conteneur.begin(), conteneur.end(), 10);
+    std::cout << *argmax << std::endl;
+  }
+
   return EXIT_SUCCESS;
 }
