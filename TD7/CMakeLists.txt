@@ -10,4 +10,4 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-add_executable(img_prog main.cpp)
+add_executable(td7 main.cpp)

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.0)
-project (td6)
+project (td8)
 
 # CONFIG COMPILATION
 if (MSVC)
@@ -10,4 +10,4 @@ else()
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
 
-add_executable(img_prog main.cpp)
+add_executable(td8 main.cpp)
